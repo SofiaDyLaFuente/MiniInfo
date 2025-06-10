@@ -3,3 +3,4 @@ Django==5.1.6
 sqlparse==0.4.4
 psycopg2-binary==2.9.7
 djangorestframework==3.16.0
+djangorestframework-simplejwt==5.3.1

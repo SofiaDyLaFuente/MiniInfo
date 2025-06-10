@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'indicador'
+    'indicador',
+   
+    # Se não inserido vai dar o erro: TemplateDoesNotExist at /api/v1/indicador/               rest_framework/api.html
+    'rest_framework'
     
 ]
 
