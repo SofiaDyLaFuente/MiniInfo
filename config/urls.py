@@ -15,8 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView
+)
 
 urlpatterns = [
+    #Rota padrão para o painel de administração do Django
     path('admin/', admin.site.urls),
+    # Inclui urls de autenticação fornecidas pelo django. Exclusivo do ambiente de deburação (frontend não usa essa url)
+    path('auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # Ponte para o arquivo de urls local
+    path('api/v1/indicador/', include('indicador.urls')),
+    # Vem da biblioteca simplejwt.views. Angular utiliza para se autenticar 
+    path('api/v1/login/', TokenObtainPairView.as_view(), name='token_obtain_pair')
 ]
