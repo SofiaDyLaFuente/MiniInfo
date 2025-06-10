@@ -24,4 +24,6 @@ class IndicadorAdmin(admin.ModelAdmin):
         'metodo_de_calculo',
         'interpretacao'
     ]
+
+    filter_horizontal= ('palavra_chave', 'etiqueta')
     
