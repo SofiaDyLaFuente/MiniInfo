@@ -29,8 +29,8 @@ class Etiqueta(models.Model):
 class Indicador(models.Model):
 
     QUALIFICACAO_CHOICES = (
-        ("A", "NÃO SEI 1"),
-        ("B", "não sei mas em minusculo"),
+        ("A", "1"),
+        ("B", "2"),
     )
 
     PERIODICIDADE_CHOICES = (
