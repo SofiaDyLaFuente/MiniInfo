@@ -1,0 +1,284 @@
+# ===================================================================
+# 1. Informações Gerais (Adaptado do seu exemplo)
+# ===================================================================
+openapi: 3.0.3
+info:
+  title: Indicadores
+  description: |-
+    Especificação para o módulo de Indicadores do InfoDF
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Servidor de Desenvolvimento
+
+tags:
+  - name: Indicadores
+    description: Operações para criar, listar, atualizar e deletar Indicadores.
+  - name: Autenticação
+    description: Endpoints para login de usuário.
+
+# ===================================================================
+# 2. Paths (Endpoints)
+# ===================================================================
+paths:
+  /indicadores/:
+    get:
+      tags:
+        - Indicadores
+      summary: Lista todos os Indicadores
+      description: Retorna uma lista paginada de indicadores, com opções de busca e ordenação.
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: Permite a busca por nome ou conceito do indicador.
+          schema:
+            type: string
+        - name: ordering
+          in: query
+          description: Campos para ordenação. Use '-' para ordem decrescente (ex -nome).
+          required: false
+          schema:
+            type: string
+            enum: [nome, ultima_atualizacao, responsavel_tecnico]
+      responses:
+        '200':
+          description: Operação bem-sucedida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicadorPaginatedList'
+      security:
+        - bearerAuth: []
+
+    post:
+      tags:
+        - Indicadores
+      summary: Cria um novo Indicador
+      description: Cria um novo indicador com base nos dados fornecidos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndicadorCreateInput'
+      responses:
+        '201':
+          description: Indicador criado com sucesso.
+          content:
+            application/json:
+              schema:
+                # Retorna o indicador completo após a criação
+                $ref: '#/components/schemas/IndicadorDetailed'
+        '400':
+          description: Erro de validação nos dados enviados.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      security:
+        - bearerAuth: []
+
+  /indicadores/{id}/:
+    get:
+      tags:
+        - Indicadores
+      summary: Busca um Indicador pelo seu ID
+      parameters:
+        - name: id
+          in: path
+          description: O ID numerico do Indicador
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalhes de um Indicador específico.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicadorDetailed'
+        '404':
+          description: Indicador não encontrado.
+      security:
+        - bearerAuth: []
+    
+    put:
+      tags:
+        - Indicadores
+      summary: Atualiza um Indicador existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID numérico do Indicador a ser atualizado.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndicadorCreateInput' # Reutilizamos o schema de criação
+      responses:
+        '200':
+          description: Indicador atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicadorDetailed'
+        '400':
+          description: Erro de validação.
+        '404':
+          description: Indicador não encontrado.
+      security:
+        - bearerAuth: []
+        
+    delete:
+      tags:
+        - Indicadores
+      summary: Deleta um Indicador
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: O ID numérico do Indicador a ser deletado.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Indicador deletado com sucesso.
+      security:
+        - bearerAuth: []
+
+  /login/:
+    post:
+      tags:
+        - Autenticação
+      summary: Autentica um usuário
+      description: Fornece um token de acesso e de atualização mediante usuário e senha.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: Autenticação bem-sucedida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '401':
+          description: Credenciais inválidas.
+
+# ===================================================================
+# 3. Componentes Reutilizáveis
+# ===================================================================
+components:
+  schemas:
+    # Schemas para Leitura (respostas da API)
+    User:
+      type: object
+      properties:
+        id: { type: integer, readOnly: true }
+        username: { type: string }
+        email: { type: string, format: email }
+
+    PalavraChave:
+      type: object
+      properties:
+        id: { type: integer, readOnly: true }
+        nome: { type: string }
+
+    Etiqueta:
+      type: object
+      properties:
+        id: { type: integer, readOnly: true }
+        nome: { type: string }
+
+    IndicadorDetailed: 
+      type: object
+      properties:
+        id: { type: integer, readOnly: true }
+        nome: { type: string }
+        destaque: { type: boolean }
+        conceito: { type: string }
+        criado_em: { type: string, format: date-time, readOnly: true }
+        ultima_atualizacao: { type: string, format: date-time, readOnly: true }
+        atualizado_por: { $ref: '#/components/schemas/User' }
+        responsavel_tecnico: { $ref: '#/components/schemas/User' }
+        palavra_chave:
+          type: array
+          items: { $ref: '#/components/schemas/PalavraChave' }
+        etiqueta:
+          type: array
+          items: { $ref: '#/components/schemas/Etiqueta' }
+
+    IndicadorShort: 
+      type: object
+      properties:
+        id: { type: integer, readOnly: true }
+        nome: { type: string }
+        responsavel_tecnico: { type: string, description: "Nome do responsável técnico" } # Simplificado para a lista
+        ultima_atualizacao: { type: string, format: date-time }
+    
+    IndicadorPaginatedList:
+      type: object
+      properties:
+        count: { type: integer }
+        next: { type: string, format: uri, nullable: true }
+        previous: { type: string, format: uri, nullable: true }
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndicadorShort' # Usamos a versão curta na lista
+
+    # Schemas para Escrita (corpo das requisições)
+    IndicadorCreateInput: 
+      type: object
+      required: [nome, responsavel_tecnico, palavra_chave]
+      properties:
+        nome: { type: string, example: "Taxa de Sucesso de Projetos" }
+        destaque: { type: boolean, default: false }
+        qualificacao: { type: string, enum: ["A", "B"] }
+        periodicidade: { type: string, enum: ["diariamente", "semanalmente", "mensalmente"] }
+        conceito: { type: string }
+        metodo_de_calculo: { type: string }
+        interpretacao: { type: string }
+        responsavel_tecnico: { type: integer, description: "ID do usuário responsável" }
+        palavra_chave:
+          type: array
+          description: "Lista de IDs das palavras-chave"
+          items: { type: integer }
+        etiqueta:
+          type: array
+          description: "Lista de IDs das etiquetas"
+          items: { type: integer }
+          
+    LoginInput:
+      type: object
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+        
+    TokenPair:
+      type: object
+      properties:
+        access: { type: string }
+        refresh: { type: string }
+
+    # Schemas de Erro
+    ValidationError:
+      type: object
+      description: "Dicionário onde a chave é o nome do campo com erro."
+      example:
+        nome: ["Este campo não pode ser em branco."]
+        responsavel_tecnico: ["Este campo é obrigatório."]
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
