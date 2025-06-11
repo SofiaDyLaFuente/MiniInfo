@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from config.settings import DEBUG
 from rest_framework_simplejwt.views import (
     TokenObtainPairView
 )
@@ -30,3 +31,9 @@ urlpatterns = [
     # Vem da biblioteca simplejwt.views. Angular utiliza para se autenticar 
     path('api/v1/login/', TokenObtainPairView.as_view(), name='token_obtain_pair')
 ]
+
+if DEBUG:
+        import debug_toolbar
+        urlpatterns = [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns

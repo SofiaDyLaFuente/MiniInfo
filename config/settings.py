@@ -25,7 +25,21 @@ SECRET_KEY = 'django-insecure-y-cgvi-8c(15hvo#is=jr&kz#a+vy(87t=@-c#l@xktm3i_x(*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Incluido IP do docker para o debutoolbar funcionar corretamente 
+INTERNAL_IPS = ["127.0.0.1", "172.19.0.1"]
+
+ALLOWED_HOSTS = ["localhost", "localhost:4200"]
+
+# Precisa adicionar quais origens tem permissão para acessar a  API (Django Cors)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",  # Porta padrão do Angular
+    "http://127.0.0.1:4200",
+    "http://localhost:8000", 
+    "http://127.0.0.1:8000"
+]
+
+# Apenas para desenvolvimento (Problema de segurança)
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -38,15 +52,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'indicador',
+    
+    # Biblioteca necessária para cuidar as requisições HTTP
+    'corsheaders',
    
     # Se não inserido vai dar o erro: TemplateDoesNotExist at /api/v1/indicador/               rest_framework/api.html
-    'rest_framework'
+    'rest_framework',
+
+    # Adicionando o debug tool bar 
+    # TODO: Adicionar verificação para so inserir quando estiver em modo DEBUG
+    'debug_toolbar'
     
 ]
 
+# A ordem do middleware importa!!!!!
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Adicionar o middleware do debug tools bar
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # Adiocionar o mIddlesware do cors
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,3 +157,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ],
+}
