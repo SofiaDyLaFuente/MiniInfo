@@ -3,7 +3,7 @@
 # ===================================================================
 openapi: 3.0.3
 info:
-  title: Indicadores
+  title: API de Indicadores
   description: |-
     Especificação para o módulo de Indicadores do InfoDF
   version: 1.0.0
@@ -69,7 +69,6 @@ paths:
           content:
             application/json:
               schema:
-                # Retorna o indicador completo após a criação
                 $ref: '#/components/schemas/IndicadorDetailed'
         '400':
           description: Erro de validação nos dados enviados.
@@ -120,7 +119,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IndicadorCreateInput' # Reutilizamos o schema de criação
+              $ref: '#/components/schemas/IndicadorCreateInput'
       responses:
         '200':
           description: Indicador atualizado com sucesso.
@@ -174,7 +173,7 @@ paths:
           description: Credenciais inválidas.
 
 # ===================================================================
-# 3. Componentes Reutilizáveis
+# 3. Componentes Reutilizáveis 
 # ===================================================================
 components:
   schemas:
@@ -208,11 +207,11 @@ components:
         criado_em: { type: string, format: date-time, readOnly: true }
         ultima_atualizacao: { type: string, format: date-time, readOnly: true }
         atualizado_por: { $ref: '#/components/schemas/User' }
-        responsavel_tecnico: { $ref: '#/components/schemas/User' }
-        palavra_chave:
+        responsavel_tecnico: { type: string } 
+        palavras_chave: 
           type: array
           items: { $ref: '#/components/schemas/PalavraChave' }
-        etiqueta:
+        etiquetas: 
           type: array
           items: { $ref: '#/components/schemas/Etiqueta' }
 
@@ -221,7 +220,7 @@ components:
       properties:
         id: { type: integer, readOnly: true }
         nome: { type: string }
-        responsavel_tecnico: { type: string, description: "Nome do responsável técnico" } # Simplificado para a lista
+        responsavel_tecnico: { type: string, description: "Nome do responsável técnico" }
         ultima_atualizacao: { type: string, format: date-time }
     
     IndicadorPaginatedList:
@@ -233,12 +232,12 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/IndicadorShort' # Usamos a versão curta na lista
+            $ref: '#/components/schemas/IndicadorShort'
 
     # Schemas para Escrita (corpo das requisições)
     IndicadorCreateInput: 
       type: object
-      required: [nome, responsavel_tecnico, palavra_chave]
+      required: [nome, palavras_chave]
       properties:
         nome: { type: string, example: "Taxa de Sucesso de Projetos" }
         destaque: { type: boolean, default: false }
@@ -247,16 +246,16 @@ components:
         conceito: { type: string }
         metodo_de_calculo: { type: string }
         interpretacao: { type: string }
-        responsavel_tecnico: { type: integer, description: "ID do usuário responsável" }
-        palavra_chave:
+        responsavel_tecnico: { type: string, description: "Nome do responsável técnico (texto livre)" }
+        palavras_chave:
           type: array
           description: "Lista de IDs das palavras-chave"
           items: { type: integer }
-        etiqueta:
+        etiquetas:
           type: array
           description: "Lista de IDs das etiquetas"
           items: { type: integer }
-          
+
     LoginInput:
       type: object
       properties:
