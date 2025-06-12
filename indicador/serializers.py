@@ -23,10 +23,8 @@ class EtiquetaSerializer(serializers.ModelSerializer):
 
 
 class IndicadorSerializer(serializers.ModelSerializer):
-    atualizado_por = UserSerializer(read_only=True)
-    responsavel_tecnico = UserSerializer(read_only=True)
-    palavra_chave = PalavraChaveSerializer(many=True)
-    etiqueta = EtiquetaSerializer(many=True)
+    palavras_chave = PalavraChaveSerializer(many=True)
+    etiquetas = EtiquetaSerializer(many=True)
     qualificacao = serializers.ChoiceField(choices=Indicador.QUALIFICACAO_CHOICES)
     periodicidade = serializers.ChoiceField(choices=Indicador.PERIODICIDADE_CHOICES)
     
@@ -35,15 +33,14 @@ class IndicadorSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'nome',
-            'atualizado_por',
             'destaque',
             'criado_em',
             'ultima_atualizacao',
             'qualificacao',
             'periodicidade',
-            'palavra_chave',
+            'palavras_chave',
             'responsavel_tecnico',
-            'etiqueta',
+            'etiquetas',
             'conceito',
             'metodo_de_calculo',
             'interpretacao'
@@ -51,64 +48,40 @@ class IndicadorSerializer(serializers.ModelSerializer):
         read_only_fields = ['criado_em', 'ultima_atualizacao', 'atualizado_por']
 
 class IndicadorCreateUpdateSerializer(serializers.ModelSerializer):
-    
-    # Para relacionamentos, esperamos receber do front apenas ID
-    responsavel_tecnico = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all()
-    )
-    palavra_chave = serializers.PrimaryKeyRelatedField(
+    palavras_chave = serializers.PrimaryKeyRelatedField(
         many=True, queryset=PalavraChave.objects.all()
     )
-    etiqueta = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Etiqueta.objects.all()
+    etiquetas = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Etiqueta.objects.all(), required=False
     )
-       
-    #def create (self, validated_data):
-        #return Indicador(**validated_data)    Fazer dessa forma so salva o objeto em memória, e não no banco 
     class Meta:
         model = Indicador
-        
-        # Fields contém os campos que devem ser enviados pelo frontend 
         fields = [
-            'nome',
-            'destaque',
-            'qualificacao',
-            'periodicidade',
-            'conceito',
-            'metodo_de_calculo',
-            'interpretacao',
-            'responsavel_tecnico',
-            'palavra_chave',
-            'etiqueta',
+            'nome', 'destaque', 'qualificacao', 'periodicidade', 'conceito',
+            'metodo_de_calculo', 'interpretacao', 'responsavel_tecnico',
+            'palavras_chave', 'etiquetas'
         ]
 
     def create(self, validated_data):
-        # Campos de relacionamento manytomany precisam ser salvos depois do objeto ser criado
-        # Faz o pop e insere posteriormente 
-        palavra_chave_data = validated_data.pop('palavra_chave')
-        etiqueta_data = validated_data.pop('etiqueta')
+        palavras_chave_data = validated_data.pop('palavras_chave')
+        etiquetas_data = validated_data.pop('etiquetas', [])
 
         indicador = Indicador.objects.create(**validated_data)
-        indicador.palavra_chave.set(palavra_chave_data)
-        indicador.etiqueta.set(etiqueta_data)
-        # .set() já salva a relação ManyToMany, não é necessário chamar indicador.save() novamente
 
+        indicador.palavras_chave.set(palavras_chave_data)
+        indicador.etiquetas.set(etiquetas_data)
         return indicador
     
-    
-    # Revisar 
     def update(self, instance, validated_data):
-        # Atualize os campos do objeto instance com os dados validados
-        palavra_chave_data = validated_data.pop('palavra_chave', None)
-        etiqueta_data = validated_data.pop('etiqueta', None)
+        palavras_chave_data = validated_data.pop('palavras_chave', None)
+        etiquetas_data = validated_data.pop('etiquetas', None)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        # Usamos super().update() para atualizar os campos simples.
+        instance = super().update(instance, validated_data)
 
-        if palavra_chave_data is not None:
-            instance.palavra_chave.set(palavra_chave_data)
-        if etiqueta_data is not None:
-            instance.etiqueta.set(etiqueta_data)
+        if palavras_chave_data is not None:
+            instance.palavras_chave.set(palavras_chave_data)
+        if etiquetas_data is not None:
+            instance.etiquetas.set(etiquetas_data)
 
         return instance

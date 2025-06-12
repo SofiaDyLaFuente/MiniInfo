@@ -7,38 +7,34 @@ from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 class IndicadorViewSet(viewsets.ModelViewSet):
-
-    http_method_names = ["get", "post", "put"]
-    pagination_class = LimitOffsetPagination
+    
+    # 1. PERMISSÕES E QUERYSET OTIMIZADA
     permission_classes = [IsAuthenticated]
-    queryset = Indicador.objects.all()
-    serializer_class = IndicadorSerializer
-   
+    queryset = Indicador.objects.select_related(
+        'responsavel_tecnico'
+    ).prefetch_related(
+        'palavras_chave', 'etiquetas'
+    ).order_by('-id')
+
+    # 2. HABILITANDO OS MÉTODOS HTTP
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+
+    # 3. FILTROS E ORDENAÇÃO
+    filter_backends = [OrderingFilter, SearchFilter]
+    ordering_fields = ['nome', 'ultima_atualizacao']
+    search_fields = ['nome', 'conceito']
+
+    # 4. MÉTODOS DE CUSTOMIZAÇÃO (O JEITO CERTO)
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return IndicadorCreateUpdateSerializer
         return IndicadorSerializer
-    
-    def create(self, request):
-        try: 
-            body = request.data
-            serializer = IndicadorCreateUpdateSerializer(data=body)
-            
-            if serializer.is_valid(raise_exception=True):
-                indicador = serializer.save(atualizado_por=self.request.user)
-                return Response({"id": indicador.id}, status.HTTP_201_CREATED)
-        
-        except ValidationError as e:
-            return Response({"code": 400, "message": e}, status=400)
-        except ObjectDoesNotExist as e:
-            return Response({"code": 404, "message": str(e)}, status=404)
 
-     
+    def perform_create(self, serializer):
+        serializer.save(atualizado_por=self.request.user)
 
-
-
-        
-
-
+    def perform_update(self, serializer):
+        serializer.save(atualizado_por=self.request.user)

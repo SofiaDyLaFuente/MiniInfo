@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,9 +27,10 @@ SECRET_KEY = 'django-insecure-y-cgvi-8c(15hvo#is=jr&kz#a+vy(87t=@-c#l@xktm3i_x(*
 DEBUG = True
 
 # Incluido IP do docker para o debutoolbar funcionar corretamente 
-INTERNAL_IPS = ["127.0.0.1", "172.19.0.1"]
+INTERNAL_IPS = ["127.0.0.1"]
 
-ALLOWED_HOSTS = ["localhost", "localhost:4200"]
+ALLOWED_HOSTS = ['localhost', 'localhost:4200']
+
 
 # Precisa adicionar quais origens tem permissão para acessar a  API (Django Cors)
 CORS_ALLOWED_ORIGINS = [
@@ -40,6 +42,15 @@ CORS_ALLOWED_ORIGINS = [
 
 # Apenas para desenvolvimento (Problema de segurança)
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Precisa inserir essa função e a configuração para o debugtoolbar aparecer 
+def show_toolbar(request):
+    res = False
+    if DEBUG:
+        res = True
+    return res
+
+DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": show_toolbar}
 
 
 # Application definition
@@ -158,6 +169,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# NOTE: (Pode ta errado) Mas serve para não exigir que os usuarios já estajam logados quando eles se logarem
+DRF_DEFAULT_PERMISSION_CLASSES = (
+    ["rest_framework.permissions.AllowAny"]
+    if DEBUG
+    else ["rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"]
+)
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
@@ -165,7 +182,14 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 100,
+    "DEFAULT_PERMISSION_CLASSES": DRF_DEFAULT_PERMISSION_CLASSES,
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
+}
+
+# Peecisa para se autenticar no bearerToken do openapi
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }

@@ -27,7 +27,7 @@ urlpatterns = [
     # Inclui urls de autenticação fornecidas pelo django. Exclusivo do ambiente de deburação (frontend não usa essa url)
     path('auth/', include('rest_framework.urls', namespace='rest_framework')),
     # Ponte para o arquivo de urls local
-    path('api/v1/indicador/', include('indicador.urls')),
+    path('api/v1/', include('indicador.urls')),
     # Vem da biblioteca simplejwt.views. Angular utiliza para se autenticar 
     path('api/v1/login/', TokenObtainPairView.as_view(), name='token_obtain_pair')
 ]

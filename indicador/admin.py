@@ -13,17 +13,19 @@ class EtiquetaAdmin(admin.ModelAdmin):
 @admin.register(Indicador)
 class IndicadorAdmin(admin.ModelAdmin):
     list_display = [
-        'id',
         'nome',
         'destaque',
-        'criado_em',
         'ultima_atualizacao',
-        'qualificacao',
-        'periodicidade',
-        'conceito',
-        'metodo_de_calculo',
-        'interpretacao'
+        'atualizado_por'
     ]
 
-    filter_horizontal= ('palavra_chave', 'etiqueta')
+    filter_horizontal= ('palavras_chave', 'etiquetas')
+
+    search_fields = ('nome', 'conceito', 'responsavel_tecnico')
+
+    # Função para inserir automaticamente a pessoa que atualizou
+    def save_model(self, request, obj, form, change):
+        obj.atualizado_por = request.user
+        super().save_model(request, obj, form, change)
+
     

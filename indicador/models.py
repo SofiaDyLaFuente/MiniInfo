@@ -46,18 +46,16 @@ class Indicador(models.Model):
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=100, unique=True)
     atualizado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="atualizado_por", on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, related_name="atualizado_por", on_delete=models.CASCADE, editable=False
     )
     destaque = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
     ultima_atualizacao = models.DateTimeField(auto_now=True)
     qualificacao = models.CharField(max_length=1, choices=QUALIFICACAO_CHOICES)
     periodicidade = models.CharField(max_length=20, choices=PERIODICIDADE_CHOICES)
-    palavra_chave = models.ManyToManyField(PalavraChave, related_name="indicadores")
-    responsavel_tecnico = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="responsavel_tecnico", on_delete=models.CASCADE
-    )
-    etiqueta = models.ManyToManyField(Etiqueta, related_name="indicadores")
+    palavras_chave = models.ManyToManyField(PalavraChave, related_name="indicadores")
+    responsavel_tecnico = models.CharField(max_length=255)
+    etiquetas = models.ManyToManyField(Etiqueta, related_name="indicadores")
     conceito = models.TextField(max_length=500, blank=True)
     metodo_de_calculo = models.TextField(max_length=500, blank=True)
     interpretacao = models.TextField(max_length=500, blank=True)
