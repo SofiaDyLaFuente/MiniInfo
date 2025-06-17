@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: InfoDF 2.0 - Sistema de Infomações Estatísticas do Distrito Federal
+  description: |-
+    Especificação das APIS para o novo Sistema de Informações Estatísticas do Distrito Federal
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: geino.uctis@ipe.df.gov.br
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 2.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: indicadores
+    description: Gestão de processos
+
+paths:
+  /api/v1/indicador/:
+    get:
+      tags:
+        - indicadores
+      summary: Lista todos os indicadores
+      description: Listagem de todos os indicadores, filtragem por tendência
+      operationId: listProcess
+      parameters:
+        - name: tendencia
+          in: query
+          required: false
+          description: Tendência do indicador (descrescente, estável, crescente)
+          schema:
+            type: integer
+            enum:
+              - -1 # Decrescente
+              - 0 # Estável
+              - 1 # Crescente
+       
+        # - name: format
+        #   in: query
+        #   required: false
+        #   schema:
+        #     type: string
+        #     default: json
+        #     enum:
+        #       - json
+        #       - csv
+        #       - xlsx
+            
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicadorSearchSet'
+            text/csv:
+              schema: {}
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema: {}
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+
+    
+components:
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: object
+          properties:
+            campo:
+              type: array
+              items:
+                type: string
+
+          
+    Indicador:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        processo:
+          type: string
+          example: "00000-00000000/2024-00"
+        objeto:
+          type: string
+          example: "Aquisição de computadores"
+        tipo_processo:
+          type: string
+          example: "Aquisição de produtos ou serviços de TI"
+        responsavel:
+          type: string
+          example: "John Doe"
+        estado:
+          type: integer
+          example: 1
+        complexidade:
+          type: integer
+          example: 0
+        data_inicio:
+          type: string
+          format: date
+        data_fim_planejada:
+          type: string
+          format: date
+        data_envio_externo_planejada:
+          type: string
+          format: date
+
+            
+    IndicadorShort:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: "Taxa de emprego"
+        qualificacao:
+          type: integer
+          enum:
+            - -1
+            - 0
+            - 1
+          example: 0
+        identificador_fonte_externa:
+          type: string
+          format: uuid
+        ultimo_valor:
+          type: number
+          example: 15.5
+        medida:
+          type: integer
+          enum:
+            - 0 # Valor numérico
+            - 1 # Porcentagem
+          example: 1
+        ultima_atualizacao:
+          type: string
+          format: date-time
+        tendencia:
+          type: integer
+          enum:
+            - 0 # Decrescente
+            - 1 # Estável
+            - 2 # Crescente
+        
+          
+    IndicadorSearchSet:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndicadorShort'
+
+    LoginBody:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "john.doe"
+        password:
+          type: string
+          example: password
+          
+    UserToken:
+      type: object
+      properties:
+        access:
+          type: string
+          example: "assdf193u9asd9"
+        refresh:
+          type: string
+          example: "assdf193u9asd9"
