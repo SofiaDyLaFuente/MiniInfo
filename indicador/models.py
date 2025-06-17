@@ -1,5 +1,21 @@
+import uuid
 from django.db import models
 from django.conf import settings
+from utils.models import LogModel
+from taggit.managers import TaggableManager
+from taggit.models import GenericTaggedItemBase, TagBase
+
+# TODO: Corrigir a implementação da fonte externa 
+class FonteExterna(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        primary_key=True,      
+        editable=False
+    )
+    descricao = models.TextField(max_length=500) 
+    
+    class Meta: 
+        verbose_name = "fonte externa"
 
 
 class PalavraChave(models.Model):
@@ -14,51 +30,59 @@ class PalavraChave(models.Model):
         verbose_name_plural = "palavras chave"
 
 
-class Etiqueta(models.Model):
+class Categoria(models.Model):
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=100, unique=True) 
+    descricao = models.TextField(max_length=500)
 
     def __str__(self):
         return self.nome
     
     class Meta:
-        verbose_name = "etiqueta"
-        verbose_name_plural = "etiquetas"
+        verbose_name = "categoria"
+        verbose_name_plural = "categorias"
 
 
-class Indicador(models.Model):
+class Indicador(LogModel):
 
-    QUALIFICACAO_CHOICES = (
-        ("A", "1"),
-        ("B", "2"),
+    NEGATIVO = -1
+    INDEFINIDO = 0
+    POSITIVO = 1
+
+    QUALIFICACAO_CHOICES = (            
+        (NEGATIVO, "Negativo"),
+        (INDEFINIDO, "Indefinido"),
+        (POSITIVO, "Positivo")
     )
 
+    MENSAL = 0
+    BIMESTRAL = 1
+    TRIMESTRAL = 2
+    SEMESTRAL = 3
+    ANUAL = 4
+    
     PERIODICIDADE_CHOICES = (
-        ("diariamente", "Diariamente"),
-        ("semanalmente", "Semanalmente"),
-        ("mensalmente", "Mensalmente"),
-        ("anualmente", "Anualmente"),
-        ("bianualmente", "Bianualmente"),
-        ("a cada 3 anos", "A cada 3 anos"),
-        ("a cada 5 anos", "A cada 5 anos"),
+        (MENSAL, "Mensal"),
+        (BIMESTRAL, "Bimestral"),
+        (TRIMESTRAL, "Trimestral"),
+        (SEMESTRAL, "Semestral"),
+        (ANUAL, "Anual")   
     )
 
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=100, unique=True)
-    atualizado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="atualizado_por", on_delete=models.CASCADE, editable=False
+    responsavel_tecnico = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="responsavel_tecnico", on_delete=models.CASCADE, editable=False
     )
     destaque = models.BooleanField(default=False)
-    criado_em = models.DateTimeField(auto_now_add=True)
-    ultima_atualizacao = models.DateTimeField(auto_now=True)
-    qualificacao = models.CharField(max_length=1, choices=QUALIFICACAO_CHOICES)
-    periodicidade = models.CharField(max_length=20, choices=PERIODICIDADE_CHOICES)
-    palavras_chave = models.ManyToManyField(PalavraChave, related_name="indicadores")
-    responsavel_tecnico = models.CharField(max_length=255)
-    etiquetas = models.ManyToManyField(Etiqueta, related_name="indicadores")
+    qualificacao = models.SmallIntegerField(choices=QUALIFICACAO_CHOICES)
+    periodicidade = models.SmallIntegerField(choices=PERIODICIDADE_CHOICES)
     conceito = models.TextField(max_length=500, blank=True)
     metodo_de_calculo = models.TextField(max_length=500, blank=True)
     interpretacao = models.TextField(max_length=500, blank=True)
+    palavras_chave = TaggableManager(through='taggit.TaggedItem', to='PalavraChave', verbose_name='palavra chave')
+    categoria = models.ForeignKey(Categoria, related_name="indicadores", blank=True, on_delete=models.CASCADE)
+    fonte_externa = models.OneToOneField(FonteExterna, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nome

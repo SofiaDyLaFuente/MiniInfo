@@ -1,31 +1,30 @@
 from django.contrib import admin
-from indicador.models import PalavraChave, Etiqueta, Indicador
+from indicador.models import PalavraChave, Categoria, Indicador, FonteExterna
 
 
-@admin.register(PalavraChave)
-class PalavraChaveAdmin(admin.ModelAdmin):
-    list_display = ["nome"]
+@admin.register(FonteExterna)
+class FonteExternaAdmin(admin.ModelAdmin):
+    list_display = ["id", "descricao"]
 
-@admin.register(Etiqueta)
-class EtiquetaAdmin(admin.ModelAdmin):
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
     list_display = ["nome"]
 
 @admin.register(Indicador)
 class IndicadorAdmin(admin.ModelAdmin):
     list_display = [
+        'categoria',
         'nome',
         'destaque',
         'ultima_atualizacao',
-        'atualizado_por'
+        'responsavel_tecnico'
     ]
-
-    filter_horizontal= ('palavras_chave', 'etiquetas')
-
-    search_fields = ('nome', 'conceito', 'responsavel_tecnico')
+    
+    search_fields = ['nome']
 
     # Função para inserir automaticamente a pessoa que atualizou
     def save_model(self, request, obj, form, change):
-        obj.atualizado_por = request.user
+        obj.responsavel_tecnico = request.user
         super().save_model(request, obj, form, change)
 
     

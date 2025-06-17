@@ -1,0 +1,114 @@
+{
+    "results": [
+        {
+            "id": 1,
+            "nome": "Taxa de desemprego",
+            "qualificacao": -1,
+            "periodicidade": 2,
+            "identificador_fonte_externa": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "ultimo_valor": 9.2,
+            "medida": 1,
+            "ultima_atualizacao": "2023-06-15T08:30:00Z",
+            "tendencia": 0
+        },
+        {
+            "id": 2,
+            "nome": "Inflação mensal",
+            "qualificacao": -1,
+            "periodicidade": 1,
+            "identificador_fonte_externa": "4eb21f94-1a2b-4c7d-8e3f-5d6g7h8i9j0k",
+            "ultimo_valor": 0.89,
+            "medida": 1,
+            "ultima_atualizacao": "2023-06-10T09:15:00Z",
+            "tendencia": 1
+        },
+        {
+            "id": 3,
+            "nome": "PIB trimestral",
+            "qualificacao": 1,
+            "periodicidade": 3,
+            "identificador_fonte_externa": "5fc32e65-9d8e-4a1b-2c3d-4e5f6a7b8c9d",
+            "ultimo_valor": 2.3,
+            "medida": 1,
+            "ultima_atualizacao": "2023-05-20T10:00:00Z",
+            "tendencia": 1
+        },
+        {
+            "id": 4,
+            "nome": "Balança comercial",
+            "qualificacao": 1,
+            "periodicidade": 2,
+            "identificador_fonte_externa": "6gd43f76-0a1b-2c3d-4e5f-7g8h9i0j1k2l",
+            "ultimo_valor": 4500,
+            "medida": 0,
+            "ultima_atualizacao": "2023-06-05T14:20:00Z",
+            "tendencia": 0
+        },
+        {
+            "id": 5,
+            "nome": "Taxa de juros básica",
+            "qualificacao": 0,
+            "periodicidade": 1,
+            "identificador_fonte_externa": "7he54g87-1b2c-3d4e-5f6g-8h9i0j1k2l3m",
+            "ultimo_valor": 13.75,
+            "medida": 1,
+            "ultima_atualizacao": "2023-06-01T11:45:00Z",
+            "tendencia": -1
+        },
+        {
+            "id": 6,
+            "nome": "Dívida pública/PIB",
+            "qualificacao": -1,
+            "periodicidade": 4,
+            "identificador_fonte_externa": "8if65h98-2c3d-4e5f-6g7h-9i0j1k2l3m4n",
+            "ultimo_valor": 75.4,
+            "medida": 1,
+            "ultima_atualizacao": "2023-04-30T16:10:00Z",
+            "tendencia": 1
+        },
+        {
+            "id": 7,
+            "nome": "Exportações agrícolas",
+            "qualificacao": 1,
+            "periodicidade": 2,
+            "identificador_fonte_externa": "9jg76i09-3d4e-5f6g-7h8i-9j0k1l2m3n4o",
+            "ultimo_valor": 12000,
+            "medida": 0,
+            "ultima_atualizacao": "2023-06-12T13:30:00Z",
+            "tendencia": 0
+        },
+        {
+            "id": 8,
+            "nome": "Índice de confiança do consumidor",
+            "qualificacao": 0,
+            "periodicidade": 1,
+            "identificador_fonte_externa": "0kh87j10-4e5f-6g7h-8i9j-0k1l2m3n4o5p",
+            "ultimo_valor": 92.7,
+            "medida": 1,
+            "ultima_atualizacao": "2023-06-08T09:00:00Z",
+            "tendencia": -1
+        },
+        {
+            "id": 9,
+            "nome": "Investimento direto estrangeiro",
+            "qualificacao": 1,
+            "periodicidade": 3,
+            "identificador_fonte_externa": "1li98k21-5f6g-7h8i-9j0k-1l2m3n4o5p6q",
+            "ultimo_valor": 3500,
+            "medida": 0,
+            "ultima_atualizacao": "2023-05-25T15:45:00Z",
+            "tendencia": 1
+        },
+        {
+            "id": 10,
+            "nome": "Taxa de poupança",
+            "qualificacao": 0,
+            "periodicidade": 4,
+            "identificador_fonte_externa": "2mj09l32-6g7h-8i9j-0k1l-2m3n4o5p6q7r",
+            "ultimo_valor": 16.8,
+            "medida": 1,
+            "ultima_atualizacao": "2023-03-31T10:20:00Z",
+            "tendencia": 0
+        }
+    ]
+}

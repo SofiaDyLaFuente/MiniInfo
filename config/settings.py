@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'indicador',
+    'utils',
+    'taggit',
     
     # Biblioteca necessária para cuidar as requisições HTTP
     'corsheaders',
